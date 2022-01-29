@@ -12,7 +12,7 @@ Install Linux or WSL.
 
 `Programming-Project-1.txt` is included with this repository, and can be executed with `./program Programming-Project-1.txt`.
 
-This project was tested and built on WSL: Ubuntu 20.04 LTS. It should work anywhere `make` and `g++` are available.
+This project was tested and built on WSL: Ubuntu 20.04 LTS. It should work anywhere `make` and `g++` are available. (Also tested on Kali 2021.2)
 
 ## Development setup
 
