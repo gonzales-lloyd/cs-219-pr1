@@ -57,10 +57,10 @@ void Interpreter::interpret_line(std::string line){
         // For the sake of this assignment, the output is simply sent to std::cout.
 
         // Derived from https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c
-        std::cout << line << " -> " 
-                  << "0x" << std::setfill ('0') << std::setw(8) << std::hex 
-                  << result 
-                  << std::dec << std::endl;
+        std::cout << line << " -> "                                                            // Show instruction
+                  << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase  // Formatting options
+                  << result                                                                    // Thing to print out
+                  << std::dec << std::endl;                                                    // Reset formatting, flush
     }else{
         throw std::runtime_error("Invalid operand");
     }
