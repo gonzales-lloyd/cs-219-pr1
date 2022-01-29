@@ -6,12 +6,21 @@
 */
 #include "Interpreter.h"
 
-int main()
+int main(int argc, char *argv[])
 {
+    std::string filepath;
+
+    if(argc == 2){
+        filepath = argv[1];
+    }else{
+        std::cout << "Usage: ./program <instruction file>" << std::endl;
+        return 1;
+    }
+
     // Instantiate the class that'll read instructions
     Interpreter interpreter;
 
-    interpreter.process_instruction_file("Programming-Project-1.txt");
+    interpreter.process_instruction_file(filepath);
 
     return 0;
 }

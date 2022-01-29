@@ -8,7 +8,9 @@ Install Linux or WSL.
 
 ## Usage example
 - Run `make`.
-- Run `./program`.
+- Run `./program <path-to-instruction-file>`.
+
+`Programming-Project-1.txt` is included with this repository, and can be executed with `./program Programming-Project-1.txt`.
 
 This project was tested and built on WSL: Ubuntu 20.04 LTS. It should work anywhere `make` and `g++` are available.
 
