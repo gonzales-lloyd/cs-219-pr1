@@ -62,7 +62,7 @@ void Interpreter::interpret_line(std::string line){
                   << result                                                                    // Thing to print out
                   << std::dec << std::endl;                                                    // Reset formatting, flush
     }else{
-        throw std::runtime_error("Invalid operand");
+        throw std::runtime_error("Invalid operation");
     }
 }
 

@@ -18,7 +18,7 @@
     @brief Class for interpreting and executing plaintext assembly, while also storing additional related values
     
     In theory, you could import this into other projects, or spin up multiple Interpreter
-    instaces - but in reality, it's just an excuse to make registers or other persistent 
+    instances - but in reality, it's just an excuse to make registers or other persistent 
     variables easier to work with.
 */
 class Interpreter{
