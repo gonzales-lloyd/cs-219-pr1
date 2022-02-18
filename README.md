@@ -1,7 +1,9 @@
 # cs-219-pr1
-This is **project part 1 for CS 219 - Computer Organization**. It is intended to emulate a program capable of interpreting and processing assembly language.
+This is **project part 2 for CS 219 - Computer Organization**. It is intended to emulate a program capable of interpreting and processing assembly language.
 
 *Note:* I didn't use `using namespace std` for the sake of personal clarity. This should be the sole difference between `code_style.cpp` and my code. I also use snake_case, not camelCase.
+
+generator.py and requirements.txt are part of the automated testing for this assignment. Ignore them.
 
 ## Installation
 Install Linux or WSL.

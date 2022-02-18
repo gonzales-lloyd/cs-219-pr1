@@ -8,9 +8,26 @@ Author: Lloyd Gonzales (lgonzalesna@nevada.unr.edu)
 
 import tabulate
 import random
+import interp
 
-operations = ["ADD"]
+# definitions
+operations = {
+    "ADD": interp.add,
+    "AND": interp.land,
+    "ASR": interp.asr,
+    "LSR": interp.lsr,
+    "LSL": interp.lsl,
+    "NOT": interp.lnot,
+    "ORR": interp.lorr,
+    "SUB": interp.sub,
+    "XOR": interp.xor
+}
 iterations = 3
+
+
+# functions
+def as_formatted_hex(uint32):
+    return "0x%X"%(uint32)
 
 def generate_row(operation):
     operand_1 = random.randint(0, 2**32)
@@ -19,10 +36,14 @@ def generate_row(operation):
     return [operation, operand_1, operand_2]
 
 def generate_test_file(filepath):
-    out_table = []
+    # Generate sample input/outputs
+    out_table = []  # 2D table where elements are rows
+    expected_outputs = [] #
     for operation in operations:
         for iteration in range(iterations):
             generate_row(operation)
+
+
 
 def main():
     # Generate input file at fixed location
