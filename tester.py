@@ -27,7 +27,7 @@ operations = {
     "SUB": interp.sub,
     "XOR": interp.xor
 }
-iterations = 3
+iterations = 100 # the bigger the number, the more likely to catch a bug, right?
 
 FILENAME = "Programming-Project-2.txt"
 
