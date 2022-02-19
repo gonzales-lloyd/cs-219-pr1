@@ -50,20 +50,45 @@ void Interpreter::interpret_line(std::string line){
     // It might be "cleaner" to use an enum or a dict with switch statements
     // But again, I'm erring towards "minimum working" since I don't know what
     // future assignments will require.
+    uint32_t result;
     if(operation == "ADD"){
-        uint32_t result = add(operand_1, operand_2);
+        result = add(operand_1, operand_2);
         
+        /*
         // The behavior of the output of an ADD (or any operator) can be varied here.
         // For the sake of this assignment, the output is simply sent to std::cout.
+        // It's the same for every other condition.
 
         // Derived from https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c
         std::cout << line << " -> "                                                            // Show instruction
                   << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase  // Formatting options
                   << result                                                                    // Thing to print out
                   << std::dec << std::endl;                                                    // Reset formatting, flush
+        */
+    }else if (operation == "AND"){
+        result = and(operand_1, operand_2);
+    }else if (operation == "ASR"){
+        result = asr(operand_1, operand_2);
+    }else if (operation == "LSR"){
+        result = lsr(operand_1, operand_2);
+    }else if (operation == "LSL"){
+        result = lsl(operand_1, operand_2);
+    }else if (operation == "NOT"){
+        result = not(operand_1, operand_2);
+    }else if (operation == "ORR"){
+        result = orr(operand_1, operand_2);
+    }else if (operation == "SUB"){
+        result = sub(operand_1, operand_2);
+    }else if (operation == "XOR"){
+        result = xor(operand_1, operand_2);
     }else{
         throw std::runtime_error("Invalid operation");
     }
+    // For now, always default to outputting to cout
+    std::cout << line << " -> "                                                            
+                << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase  
+                << result                                                                    
+                << std::dec << std::endl;
 }
 
 #pragma endregion
@@ -71,7 +96,8 @@ void Interpreter::interpret_line(std::string line){
 #pragma region Operations
 
 /**
-    Add two values, returning the value as a uint32_t.
+    @brief Add two values, returning the value as a uint32_t.
+
     @param a The first operand as a std::string in hex format.
     @param b The second operand as a std::string in hex format.
     @return a uint32_t with the result of the addition.
@@ -86,6 +112,117 @@ uint32_t Interpreter::add(std::string a, std::string b){
     uint32_t operand_2 = std::stoul(b, nullptr, 16);
 
     return operand_1 + operand_2;
+}
+
+/**
+    @brief Take the bitwise AND of the operands.
+    
+    @param a The first operand as a std::string in hex format.
+    @param b The second operand as a std::string in hex format.
+    @return a uint32_t with the result of the bitwise AND.
+*/
+uint32_t Interpreter::and(std::string a, std::string b){
+    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+    uint32_t operand_2 = std::stoul(b, nullptr, 16);
+
+    return operand_1 & operand_2;
+}
+
+/**
+    @brief Perform a 1-bit arithmetic right shift.
+    
+    @param a The first operand as a std::string in hex format.
+    @param b Currently ignored.
+    @return a uint32_t with the result of the arithmetic right shift.
+*/
+uint32_t Interpreter::asr(std::string a, std::string b){
+    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+
+    // convince the compiler this is a signed value without actually changing bits
+    int32_t operand = reinterpret_cast<int32_t>(&operand_1);
+    operand >> 1;
+    return reinterpret_cast<uint32_t>(&operand);
+}
+
+/**
+    @brief Perform a 1-bit logical right shift.
+    
+    @param a The first operand as a std::string in hex format.
+    @param b Currently ignored.
+    @return a uint32_t with the result of the logical right shift.
+*/
+uint32_t Interpreter::lsr(std::string a, std::string b){
+    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+
+    return operand_1 >> 1;
+}
+
+/**
+    @brief Perform a 1-bit logical left shift.
+    
+    @param a The first operand as a std::string in hex format.
+    @param b Currently ignored.
+    @return a uint32_t with the result of the logical left shift.
+*/
+uint32_t Interpreter::lsl(std::string a, std::string b){
+    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+
+    return operand_1 << 1;
+}
+
+/**
+    @brief Perform a bitwise NOT.
+    
+    @param a The first operand as a std::string in hex format.
+    @param b Currently ignored.
+    @return a uint32_t with the result of the bitwise NOT.
+*/
+uint32_t Interpreter::not(std::string a, std::string b){
+    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+
+    return ~operand_1;
+}
+
+/**
+    @brief Perform a bitwise OR on two operands..
+    
+    @param a The first operand as a std::string in hex format.
+    @param b The second operand as a std::string in hex format.
+    @return a uint32_t with the result of the bitwise OR.
+*/
+uint32_t Interpreter::orr(std::string a, std::string b){
+    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+    uint32_t operand_2 = std::stoul(b, nullptr, 16);
+
+    return operand_1 | operand_2;    
+}
+
+/**
+    @brief Subtract two values, returning the value as a uint32_t.
+    
+    @param a The first operand as a std::string in hex format.
+    @param b The second operand as a std::string in hex format.
+    @return a uint32_t with the result of the subtraction (a - b).
+*/
+uint32_t Interpreter::sub(std::string a, std::string b){
+    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+    uint32_t operand_2 = std::stoul(b, nullptr, 16);
+
+    return operand_1 - operand_2;
+}
+
+/**
+    @brief Perform a bitwise XOR on two operands.
+    
+    @param a The first operand as a std::string in hex format.
+    @param b The second operand as a std::string in hex format.
+    @return a uint32_t with the result of the bitwise XOR.
+*/
+uint32_t Interpreter::xor(std::string a, std::string b){
+    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+    uint32_t operand_2 = std::stoul(b, nullptr, 16);
+
+    return operand_1 ^ operand_2;    
 }
 
 #pragma endregion

@@ -32,6 +32,14 @@ public:
     void interpret_line(std::string line);
 
     uint32_t add(std::string a, std::string b);
+    uint32_t and(std::string a, std::string b);
+    uint32_t asr(std::string a, std::string b);
+    uint32_t lsr(std::string a, std::string b);
+    uint32_t lsl(std::string a, std::string b);
+    uint32_t not(std::string a, std::string b);
+    uint32_t orr(std::string a, std::string b);
+    uint32_t sub(std::string a, std::string b);
+    uint32_t xor(std::string a, std::string b);
 };
 
 #endif
