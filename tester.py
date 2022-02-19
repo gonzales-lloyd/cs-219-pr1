@@ -7,10 +7,11 @@ Do not grade.
 Author: Lloyd Gonzales (lgonzalesna@nevada.unr.edu)
 """
 
-import tabulate
+from tabulate import tabulate
 import random
 import re
 from pprint import pprint
+import os
 
 import interp
 
@@ -35,6 +36,9 @@ FILENAME = "Programming-Project-2.txt"
 def as_formatted_hex(uint32):
     return "0x%X"%(uint32)
 
+def as_padded_formatted_hex(uint32):
+    return "0x"+"%X"%(uint32).zfill(8)
+
 def generate_row(operation):
     operand_1 = random.randint(0, 2**32)
     operand_2 = random.randint(0, 2**32)
@@ -48,14 +52,14 @@ def generate_test_file(filepath):
     for operation in operations:
         for iteration in range(iterations):
             row = generate_row(operation)
-            out_table.append(row)
+            out_table.append([row[0], as_formatted_hex(row[1]), as_formatted_hex(row[2])])
             
             expected_value = operations[operation](row[1], row[2])
             expected_outputs.append(as_formatted_hex(expected_value))
     
     # Run through tabulate, all elements right aligned with one space padding
-    # Is not truly identical to PA1's format but it's one extra space
-    out_str = tabulate(out_table, format="plain", stralign="left")
+    # Identical to PA1's format on paper
+    out_str = tabulate(out_table, tablefmt="plain", stralign="right")
     with open(filepath, "w") as fp:
         fp.write(out_str)
 
@@ -68,22 +72,30 @@ def main():
     expected_out = generate_test_file(FILENAME)
 
     # Run program with generated input file
-    output = os.popen(FILENAME).read()
+    output = os.popen(f"./program {FILENAME}").read()
 
     # Parse program output
     output_lines = output.split("\n")
+    output_hexes = []
 
-    output_search = re.search('-> (.*)\n', line, re.IGNORECASE)
-    output_count = len(output_search.groups())
+    for line in output_lines:
+        if line:
+            print(line)
+            output_search = re.search('-> (.*)', line, re.IGNORECASE)
+            out_hex = output_search.group(1)
+            output_hexes.append(out_hex)
+
+    output_count = len(output_hexes)
+
 
     # Assert that program output is identical to expected
     if output_count != len(expected_out):
         print("failed: number of groups is not equal to number of inputs")
-        pprint(output)
+        print(output)
         print(output_count, expected_out)
 
     for i in range(output_count):
-        print(f"{output_lines[i]} is {expected_out[i] == output_search.group(i+1)} ({expected_out=}, {output_search.group(i+1)=})")
+        print(f"{output_lines[i]} is {expected_out[i] == output_hexes[i]} ({expected_out[i]=}, {output_hexes[i]=})")
 
 
 if __name__ == "__main__":
