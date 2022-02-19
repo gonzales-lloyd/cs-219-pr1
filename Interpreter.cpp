@@ -7,6 +7,8 @@
 
 #include "Interpreter.h"
 
+#include <bitset>
+
 #pragma region Core
 /**
     Process an entire file, running until the end of the file is reached (or some other terminating condition).
@@ -136,12 +138,24 @@ uint32_t Interpreter::land(std::string a, std::string b){
     @return a uint32_t with the result of the arithmetic right shift.
 */
 uint32_t Interpreter::asr(std::string a, std::string b){
-    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+    //begin by assuming it's signed to begin with
+    int32_t operand_1 = std::stol(a, nullptr, 16);
+    operand_1 = operand_1 >> 1;
+    // convince the compiler it's an unsigned without changing bits
+    uint32_t* out = reinterpret_cast<uint32_t*>(&operand_1);
+    return *out;
 
+    /**
     // convince the compiler this is a signed value without actually changing bits
-    int32_t operand = reinterpret_cast<int32_t>(&operand_1);
-    operand >> 1;
-    return reinterpret_cast<uint32_t>(&operand);
+    //std::cout << std::bitset<32>(operand_1) << std::endl;  
+    int32_t* operand = reinterpret_cast<int32_t*>(&operand_1);
+    //std::cout << std::bitset<32>(*operand) << std::endl;  
+    *operand = *operand >> 1;
+    //std::cout << std::bitset<32>(*operand) << std::endl;  
+    uint32_t* out = reinterpret_cast<uint32_t*>(operand);
+    //std::cout << std::bitset<32>(*out) << std::endl;  
+    return *out;
+    **/
 }
 
 /**
