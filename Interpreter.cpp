@@ -66,7 +66,7 @@ void Interpreter::interpret_line(std::string line){
                   << std::dec << std::endl;                                                    // Reset formatting, flush
         */
     }else if (operation == "AND"){
-        result = and(operand_1, operand_2);
+        result = land(operand_1, operand_2);
     }else if (operation == "ASR"){
         result = asr(operand_1, operand_2);
     }else if (operation == "LSR"){
@@ -74,13 +74,13 @@ void Interpreter::interpret_line(std::string line){
     }else if (operation == "LSL"){
         result = lsl(operand_1, operand_2);
     }else if (operation == "NOT"){
-        result = not(operand_1, operand_2);
+        result = lnot(operand_1, operand_2);
     }else if (operation == "ORR"){
         result = orr(operand_1, operand_2);
     }else if (operation == "SUB"){
         result = sub(operand_1, operand_2);
     }else if (operation == "XOR"){
-        result = xor(operand_1, operand_2);
+        result = lxor(operand_1, operand_2);
     }else{
         throw std::runtime_error("Invalid operation");
     }
@@ -121,7 +121,7 @@ uint32_t Interpreter::add(std::string a, std::string b){
     @param b The second operand as a std::string in hex format.
     @return a uint32_t with the result of the bitwise AND.
 */
-uint32_t Interpreter::and(std::string a, std::string b){
+uint32_t Interpreter::land(std::string a, std::string b){
     uint32_t operand_1 = std::stoul(a, nullptr, 16);
     uint32_t operand_2 = std::stoul(b, nullptr, 16);
 
@@ -177,7 +177,7 @@ uint32_t Interpreter::lsl(std::string a, std::string b){
     @param b Currently ignored.
     @return a uint32_t with the result of the bitwise NOT.
 */
-uint32_t Interpreter::not(std::string a, std::string b){
+uint32_t Interpreter::lnot(std::string a, std::string b){
     uint32_t operand_1 = std::stoul(a, nullptr, 16);
 
     return ~operand_1;
@@ -218,7 +218,7 @@ uint32_t Interpreter::sub(std::string a, std::string b){
     @param b The second operand as a std::string in hex format.
     @return a uint32_t with the result of the bitwise XOR.
 */
-uint32_t Interpreter::xor(std::string a, std::string b){
+uint32_t Interpreter::lxor(std::string a, std::string b){
     uint32_t operand_1 = std::stoul(a, nullptr, 16);
     uint32_t operand_2 = std::stoul(b, nullptr, 16);
 
