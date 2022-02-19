@@ -37,7 +37,7 @@ def as_formatted_hex(uint32):
     return "0x%X"%(uint32)
 
 def as_padded_formatted_hex(uint32):
-    return "0x"+"%X"%(uint32).zfill(8)
+    return "0x"+("%X"%(uint32)).zfill(8)
 
 def generate_row(operation):
     operand_1 = random.randint(0, 2**32)
@@ -55,7 +55,7 @@ def generate_test_file(filepath):
             out_table.append([row[0], as_formatted_hex(row[1]), as_formatted_hex(row[2])])
             
             expected_value = operations[operation](row[1], row[2])
-            expected_outputs.append(as_formatted_hex(expected_value))
+            expected_outputs.append(as_padded_formatted_hex(expected_value))
     
     # Run through tabulate, all elements right aligned with one space padding
     # Identical to PA1's format on paper
@@ -80,13 +80,12 @@ def main():
 
     for line in output_lines:
         if line:
-            print(line)
+            # print(line)
             output_search = re.search('-> (.*)', line, re.IGNORECASE)
             out_hex = output_search.group(1)
             output_hexes.append(out_hex)
 
     output_count = len(output_hexes)
-
 
     # Assert that program output is identical to expected
     if output_count != len(expected_out):
@@ -94,8 +93,17 @@ def main():
         print(output)
         print(output_count, expected_out)
 
+    passing = 0
+    failing = 0
     for i in range(output_count):
-        print(f"{output_lines[i]} is {expected_out[i] == output_hexes[i]} ({expected_out[i]=}, {output_hexes[i]=})")
+        if expected_out[i] == output_hexes[i]:
+            passing += 1
+            # print(f"{output_lines[i]} is {expected_out[i] == output_hexes[i]} ({expected_out[i]=}, {output_hexes[i]=})")
+        else:
+            failing += 1
+            print(f"{output_lines[i]} is {expected_out[i] == output_hexes[i]} ({expected_out[i]=}, {output_hexes[i]=})")
+
+    print(f"Summary: {passing} passing, {failing} failing")
 
 
 if __name__ == "__main__":
