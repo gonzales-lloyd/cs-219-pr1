@@ -33,4 +33,7 @@
 
 # Executable name
 program
+
+# Local folders
 /__pycache__
+/.vscode
