@@ -5,15 +5,25 @@ Author: Lloyd Gonzales (lgonzalesna@nevada.unr.edu)
 """
 
 import ctypes
+from math import floor
 
 def add(operand_1, operand_2):
     return ctypes.c_uint32(operand_1 + operand_2).value
 
 def land(operand_1, operand_2):
-    return ctypes.c_uint32(operand_1 | operand_2).value
+    return ctypes.c_uint32(operand_1 & operand_2).value
 
 def asr(operand_1, operand_2):
-    return ctypes.c_uint32(operand_1).value >> 1
+    # check if 32nd bit is 1 or 0
+    # https://stackoverflow.com/questions/28590639/python-check-if-bit-in-sequence-is-true-or-false
+    operand = ctypes.c_uint32(operand_1).value
+    if(operand & (1<<31)):
+        # shift over right, then OR it with a 1 on the 32nd bit
+        return (operand >> 1) | (1<<31)
+    else:
+        # it was a 0 to begin with, and there is no need to insert a leading 0
+        return operand >> 1
+
 
 def lsr(operand_1, operand_2):
     operand = ctypes.c_uint32(operand_1).value 
