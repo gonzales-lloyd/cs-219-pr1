@@ -3,7 +3,11 @@ This is **project part 2 for CS 219 - Computer Organization**. It is intended to
 
 *Note:* I didn't use `using namespace std` for the sake of personal clarity. This should be the sole difference between `code_style.cpp` and my code. I also use snake_case, not camelCase.
 
-generator.py and requirements.txt are part of the automated testing for this assignment. Ignore them.
+The following files were used for testing and can be ignored:
+- `tester.py`
+- `interp.py`
+- `requirements.txt`
+- `Programming-Project-*.txt`
 
 ## Installation
 Install Linux or WSL.
