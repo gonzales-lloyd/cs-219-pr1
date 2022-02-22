@@ -16,9 +16,9 @@ Install Linux or WSL.
 - Run `make`.
 - Run `./program <path-to-instruction-file>`.
 
-`Programming-Project-1.txt` is included with this repository, and can be executed with `./program Programming-Project-1.txt`.
+`handtests.txt` and `Programming-Project-2.txt` are included with this repository, and can be executed with `./program handtests.txt` and `./program Programming-Project-2.txt`, respectively. The first file contains no second operand for functions that do not currently use a second operand; the second file contains 100 lines for each function *with* a second operand..
 
-*Debug only*: In addition, `Programming-Project-2.txt` is an available test file with 100 instances of each function. To generate new test files, use `interp.py`. For handwritten testing, use `handtests.py`.
+*Debug only*: To generate new test files, use `interp.py`. For handwritten testing, use `handtests.py`.
 
 This project was tested and built on WSL: Ubuntu 20.04 LTS. It should work anywhere `make` and `g++` are available. (Also tested on Kali 2021.2)
 
