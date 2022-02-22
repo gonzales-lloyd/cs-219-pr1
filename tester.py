@@ -30,7 +30,7 @@ operations = {
 iterations = 100 # the bigger the number, the more likely to catch a bug, right?
 
 FILENAME = "Programming-Project-2.txt"
-
+GENERATE_FILE = True
 
 # functions
 def as_formatted_hex(uint32):
@@ -67,9 +67,10 @@ def generate_test_file(filepath):
 
 
 
-def main():
-    # Generate input file at fixed location
-    expected_out = generate_test_file(FILENAME)
+def main(expected_out=None, generate_file=True):
+    if generate_file:
+        # Generate input file at fixed location
+        expected_out = generate_test_file(FILENAME)
 
     # Run program with generated input file
     output = os.popen(f"./program {FILENAME}").read()
@@ -107,4 +108,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(None, GENERATE_FILE)
