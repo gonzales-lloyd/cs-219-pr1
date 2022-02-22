@@ -1,5 +1,5 @@
 /**
-    (CS 219 - Assignment 1) Driver file.
+    (CS 219 - Assignment 2) Driver file.
     @file main.cpp
     @author Lloyd Gonzales
     @version 1.0 1/28/2022

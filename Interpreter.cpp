@@ -1,5 +1,5 @@
 /**
-    (CS 219 - Assignment 1) Implementation file of the Interpreter class.
+    (CS 219 - Assignment 2) Implementation file of the Interpreter class.
     @file Interpreter.cpp
     @author Lloyd Gonzales
     @version 1.0 1/28/2022
