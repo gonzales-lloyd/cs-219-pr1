@@ -25,8 +25,15 @@
 */
 class Interpreter{
 private:
-    // Registers: zero-initialization applies here
-    uint32_t r0, r1, r2, r3, r4, r5, r6, r7;
+    // Registers
+    uint32_t r0 = 0;
+    uint32_t r1 = 0;
+    uint32_t r2 = 0;
+    uint32_t r3 = 0;
+    uint32_t r4 = 0;
+    uint32_t r5 = 0;
+    uint32_t r6 = 0;
+    uint32_t r7 = 0;
 public:
     void process_instruction_file(std::string filepath);
     void interpret_line(std::string line);

@@ -193,7 +193,7 @@ void Interpreter::asr(std::string Rd, std::string Rn){
     int32_t* step_1 = reinterpret_cast<int32_t*>(&operand_1);
     *step_1 = *step_1 >> 1;
     // make the result unsigned
-    uint32_t* step_2 = reinterpret_cast<uint32_t*>(&step_1);
+    uint32_t* step_2 = reinterpret_cast<uint32_t*>(step_1);
     
     //store result in destination register
     uint32_t* destination_register = string_to_register_pointer(Rd);
