@@ -13,6 +13,8 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <bitset>
+#include <algorithm>
 
 /**
     @brief Class for interpreting and executing plaintext assembly, while also storing additional related values
@@ -23,23 +25,24 @@
 */
 class Interpreter{
 private:
-    // In theory you could put more useful variables here
-    // General registers, instruction pointers, etc...
-    // But I've left that out since I don't know exactly how future things will look like
-    uint32_t last_result = 0;
+    // Registers: zero-initialization applies here
+    uint32_t r0, r1, r2, r3, r4, r5, r6, r7;
 public:
     void process_instruction_file(std::string filepath);
     void interpret_line(std::string line);
+    uint32_t* string_to_register_pointer(std::string reg);
+    uint32_t immediate_to_int(std::string Imm);
 
-    uint32_t add(std::string a, std::string b);
-    uint32_t land(std::string a, std::string b);
-    uint32_t asr(std::string a, std::string b);
-    uint32_t lsr(std::string a, std::string b);
-    uint32_t lsl(std::string a, std::string b);
-    uint32_t lnot(std::string a, std::string b);
-    uint32_t orr(std::string a, std::string b);
-    uint32_t sub(std::string a, std::string b);
-    uint32_t lxor(std::string a, std::string b);
+    void add(std::string Rd, std::string Rn, std::string Rm);
+    void land(std::string Rd, std::string Rn, std::string Rm);
+    void asr(std::string Rd, std::string Rn);
+    void lsr(std::string Rd, std::string Rn);
+    void lsl(std::string Rd, std::string Rn);
+    void orr(std::string Rd, std::string Rn, std::string Rm);
+    void sub(std::string Rd, std::string Rn, std::string Rm);
+    void lxor(std::string Rd, std::string Rn, std::string Rm);
+
+    void mov(std::string Rd, std::string Imm);
 };
 
 #endif

@@ -7,7 +7,7 @@ main.o: main.cpp
 	g++ -c main.cpp
 
 Interpreter.o: Interpreter.cpp Interpreter.h
-	g++ -c Interpreter.cpp -fpermissive
+	g++ -c Interpreter.cpp
 
 clean:
 	rm *.o program

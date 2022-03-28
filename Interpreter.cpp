@@ -7,7 +7,7 @@
 
 #include "Interpreter.h"
 
-#include <bitset>
+
 
 #pragma region Core
 /**
@@ -33,6 +33,13 @@ void Interpreter::process_instruction_file(std::string filepath){
     @param line The instruction to process.
 */
 void Interpreter::interpret_line(std::string line){
+    // Begin by converting all commas to spaces
+    // https://www.cplusplus.com/forum/general/33581/
+    std::replace(line.begin(), line.end(), ',', ' ');
+    // Also, convert full string to uppercase
+    // https://stackoverflow.com/questions/735204/convert-a-string-in-c-to-upper-case
+    std::transform(line.begin(), line.end(), line.begin(), ::toupper);
+    
     // Since interpret_line is a public function that could theoretically be called
     // without respect to a file, everything is a std::string to begin with
     std::stringstream ss;
@@ -44,53 +51,78 @@ void Interpreter::interpret_line(std::string line){
     std::string operation;
     std::string operand_1;
     std::string operand_2;
+    std::string operand_3;
 
     // This implicitly removes all whitespace and stores variables as needed
-    ss >> operation >> operand_1 >> operand_2;
+    ss >> operation >> operand_1 >> operand_2 >> operand_3;
 
     // Choose what to do based on the operation.
     // It might be "cleaner" to use an enum or a dict with switch statements
     // But again, I'm erring towards "minimum working" since I don't know what
     // future assignments will require.
-    uint32_t result;
     if(operation == "ADD"){
-        result = add(operand_1, operand_2);
-        
-        /*
-        // The behavior of the output of an ADD (or any operator) can be varied here.
-        // For the sake of this assignment, the output is simply sent to std::cout.
-        // It's the same for every other condition.
-
-        // Derived from https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c
-        std::cout << line << " -> "                                                            // Show instruction
-                  << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase  // Formatting options
-                  << result                                                                    // Thing to print out
-                  << std::dec << std::endl;                                                    // Reset formatting, flush
-        */
+        add(operand_1, operand_2, operand_3);
     }else if (operation == "AND"){
-        result = land(operand_1, operand_2);
+        land(operand_1, operand_2, operand_3);
     }else if (operation == "ASR"){
-        result = asr(operand_1, operand_2);
+        asr(operand_1, operand_2);
     }else if (operation == "LSR"){
-        result = lsr(operand_1, operand_2);
+        lsr(operand_1, operand_2);
     }else if (operation == "LSL"){
-        result = lsl(operand_1, operand_2);
-    }else if (operation == "NOT"){
-        result = lnot(operand_1, operand_2);
+        lsl(operand_1, operand_2);
     }else if (operation == "ORR"){
-        result = orr(operand_1, operand_2);
+        orr(operand_1, operand_2, operand_3);
     }else if (operation == "SUB"){
-        result = sub(operand_1, operand_2);
+        sub(operand_1, operand_2, operand_3);
     }else if (operation == "XOR"){
-        result = lxor(operand_1, operand_2);
+        lxor(operand_1, operand_2, operand_3);
+    }else if (operation == "MOV"){
+        mov(operand_1, operand_2);
     }else{
         throw std::runtime_error("Invalid operation");
     }
-    // For now, always default to outputting to cout
-    std::cout << line << " -> "                                                            
-                << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase  
-                << result                                                                    
-                << std::dec << std::endl;
+}
+
+/**
+ * @brief Translate a register "string" (r1, r2, etc.) to the associated register.
+ * 
+ * @param reg The string to translate.
+ * @return uint32_t* A pointer to the associated register.
+ * 
+ * Use *result = ... to update a register.
+ */
+uint32_t* Interpreter::string_to_register_pointer(std::string reg){
+    if(reg == "R0"){
+        return &r0;
+    }else if(reg == "R1"){
+        return &r1;
+    }else if(reg == "R2"){
+        return &r2;  
+    }else if(reg == "R3"){
+        return &r3;
+    }else if(reg == "R4"){
+        return &r4;
+    }else if(reg == "R5"){
+        return &r5;
+    }else if(reg == "R6"){
+        return &r6;
+    }else if(reg == "R7"){
+        return &r7;
+    }else{
+        throw std::runtime_error("Invalid register");
+    }
+}
+
+/**
+ * @brief Convert an immediate operand (in #0x... format) to a uint32_t.
+ * 
+ * @param Imm The immediate operand (in its original form.)
+ * @return uint32_t The 32-bit value represented by Imm.
+ */
+uint32_t Interpreter::immediate_to_int(std::string Imm){
+    //begin by stripping out the #, assumed to be the first character
+    std::string stripped = Imm.substr(1, std::string::npos);
+    return std::stoul(stripped, nullptr, 16);
 }
 
 #pragma endregion
@@ -98,145 +130,212 @@ void Interpreter::interpret_line(std::string line){
 #pragma region Operations
 
 /**
-    @brief Add two values, returning the value as a uint32_t.
+    @brief Add Rn and Rm, storing it in Rd.
 
-    @param a The first operand as a std::string in hex format.
-    @param b The second operand as a std::string in hex format.
-    @return a uint32_t with the result of the addition.
+    @param Rd The destination register.
+    @param Rn Operand 1, as a register.
+    @param Rm Operand 2, as a register.
 */
-uint32_t Interpreter::add(std::string a, std::string b){
+void Interpreter::add(std::string Rd, std::string Rn, std::string Rm){
     // Derived from:
     // https://stackoverflow.com/questions/1070497/c-convert-hex-string-to-signed-integer
     // https://en.cppreference.com/w/cpp/string/basic_string/stoul
 
     // It's also possible to have it autodetect, but for now it's explicitly set to hex
-    uint32_t operand_1 = std::stoul(a, nullptr, 16);
-    uint32_t operand_2 = std::stoul(b, nullptr, 16);
+    uint32_t operand_1 = *string_to_register_pointer(Rn);
+    uint32_t operand_2 = *string_to_register_pointer(Rm);
 
-    return operand_1 + operand_2;
+    uint32_t* destination_register = string_to_register_pointer(Rd);
+
+    *destination_register = operand_1 + operand_2;
+
+    // Format and output what happened
+    std::cout << "ADD " << Rd << ", " << Rn << ", " << Rm << "\n"
+              << " -> " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << *destination_register                                                                    
+              << std::dec << std::endl;
 }
 
 /**
-    @brief Take the bitwise AND of the operands.
-    
-    @param a The first operand as a std::string in hex format.
-    @param b The second operand as a std::string in hex format.
-    @return a uint32_t with the result of the bitwise AND.
-*/
-uint32_t Interpreter::land(std::string a, std::string b){
-    uint32_t operand_1 = std::stoul(a, nullptr, 16);
-    uint32_t operand_2 = std::stoul(b, nullptr, 16);
+    @brief Take the bitwise AND of Rn and Rm, storing it in Rd.
 
-    return operand_1 & operand_2;
+    @param Rd The destination register.
+    @param Rn Operand 1, as a register.
+    @param Rm Operand 2, as a register.
+*/
+void Interpreter::land(std::string Rd, std::string Rn, std::string Rm){
+    uint32_t operand_1 = *string_to_register_pointer(Rn);
+    uint32_t operand_2 = *string_to_register_pointer(Rm);
+
+    uint32_t* destination_register = string_to_register_pointer(Rd);
+
+    *destination_register = operand_1 & operand_2;
+
+    // Format and output what happened
+    std::cout << "AND " << Rd << ", " << Rn << ", " << Rm << "\n"
+              << " -> " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << *destination_register                                                                    
+              << std::dec << std::endl;
 }
 
 /**
-    @brief Perform a 1-bit arithmetic right shift.
+    @brief Perform a 1-bit arithmetic right shift on Rn, storing it in Rd.
     
-    @param a The first operand as a std::string in hex format.
-    @param b Currently ignored.
-    @return a uint32_t with the result of the arithmetic right shift.
+    @param Rd The destination register.
+    @param Rn The register to perform a shift on.
 */
-uint32_t Interpreter::asr(std::string a, std::string b){
-    //begin by assuming it's signed to begin with
-    int32_t operand_1 = std::stol(a, nullptr, 16);
-    operand_1 = operand_1 >> 1;
-    // convince the compiler it's an unsigned without changing bits
-    uint32_t* out = reinterpret_cast<uint32_t*>(&operand_1);
-    return *out;
+void Interpreter::asr(std::string Rd, std::string Rn){
+    //begin with the unsigned bits
+    uint32_t operand_1 = *string_to_register_pointer(Rn);
+    // convince the compiler it's a signed without changing bits
+    int32_t* step_1 = reinterpret_cast<int32_t*>(&operand_1);
+    *step_1 = *step_1 >> 1;
+    // make the result unsigned
+    uint32_t* step_2 = reinterpret_cast<uint32_t*>(&step_1);
+    
+    //store result in destination register
+    uint32_t* destination_register = string_to_register_pointer(Rd);
 
-    /**
-    // convince the compiler this is a signed value without actually changing bits
-    //std::cout << std::bitset<32>(operand_1) << std::endl;  
-    int32_t* operand = reinterpret_cast<int32_t*>(&operand_1);
-    //std::cout << std::bitset<32>(*operand) << std::endl;  
-    *operand = *operand >> 1;
-    //std::cout << std::bitset<32>(*operand) << std::endl;  
-    uint32_t* out = reinterpret_cast<uint32_t*>(operand);
-    //std::cout << std::bitset<32>(*out) << std::endl;  
-    return *out;
-    **/
+    *destination_register = *step_2;
+
+    // Format and output what happened
+    std::cout << "ASR " << Rd << ", " << Rn << "\n"
+              << " -> " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << *destination_register                                                                    
+              << std::dec << std::endl;
 }
 
 /**
-    @brief Perform a 1-bit logical right shift.
+    @brief Perform a 1-bit logical right shift on Rn, storing it in Rd.
     
-    @param a The first operand as a std::string in hex format.
-    @param b Currently ignored.
-    @return a uint32_t with the result of the logical right shift.
+    @param Rd The destination register.
+    @param Rn The register to perform a shift on.
 */
-uint32_t Interpreter::lsr(std::string a, std::string b){
-    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+void Interpreter::lsr(std::string Rd, std::string Rn){
+    uint32_t operand_1 = *string_to_register_pointer(Rn);
+    
+    //store result in destination register
+    uint32_t* destination_register = string_to_register_pointer(Rd);
 
-    return operand_1 >> 1;
+    *destination_register = operand_1 >> 1;
+
+    // Format and output what happened
+    std::cout << "LSR " << Rd << ", " << Rn << "\n"
+              << " -> " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << *destination_register                                                                    
+              << std::dec << std::endl;
 }
 
 /**
-    @brief Perform a 1-bit logical left shift.
+    @brief Perform a 1-bit logical left shift on Rn, storing it in Rd.
     
-    @param a The first operand as a std::string in hex format.
-    @param b Currently ignored.
-    @return a uint32_t with the result of the logical left shift.
+    @param Rd The destination register.
+    @param Rn The register to perform a shift on.
 */
-uint32_t Interpreter::lsl(std::string a, std::string b){
-    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+void Interpreter::lsl(std::string Rd, std::string Rn){
+    uint32_t operand_1 = *string_to_register_pointer(Rn);
+    
+    //store result in destination register
+    uint32_t* destination_register = string_to_register_pointer(Rd);
 
-    return operand_1 << 1;
+    *destination_register = operand_1 << 1;
+
+    // Format and output what happened
+    std::cout << "LSL " << Rd << ", " << Rn << "\n"
+              << " -> " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << *destination_register                                                                    
+              << std::dec << std::endl;
 }
 
 /**
-    @brief Perform a bitwise NOT.
-    
-    @param a The first operand as a std::string in hex format.
-    @param b Currently ignored.
-    @return a uint32_t with the result of the bitwise NOT.
-*/
-uint32_t Interpreter::lnot(std::string a, std::string b){
-    uint32_t operand_1 = std::stoul(a, nullptr, 16);
+    @brief Take the bitwise OR of Rn and Rm, storing it in Rd.
 
-    return ~operand_1;
+    @param Rd The destination register.
+    @param Rn Operand 1, as a register.
+    @param Rm Operand 2, as a register.
+*/
+void Interpreter::orr(std::string Rd, std::string Rn, std::string Rm){
+    uint32_t operand_1 = *string_to_register_pointer(Rn);
+    uint32_t operand_2 = *string_to_register_pointer(Rm);
+
+    uint32_t* destination_register = string_to_register_pointer(Rd);
+
+    *destination_register = operand_1 | operand_2;
+
+    // Format and output what happened
+    std::cout << "ORR " << Rd << ", " << Rn << ", " << Rm << "\n"
+              << " -> " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << *destination_register                                                                    
+              << std::dec << std::endl;
 }
 
 /**
-    @brief Perform a bitwise OR on two operands..
-    
-    @param a The first operand as a std::string in hex format.
-    @param b The second operand as a std::string in hex format.
-    @return a uint32_t with the result of the bitwise OR.
-*/
-uint32_t Interpreter::orr(std::string a, std::string b){
-    uint32_t operand_1 = std::stoul(a, nullptr, 16);
-    uint32_t operand_2 = std::stoul(b, nullptr, 16);
+    @brief Subtract Rm from Rn (Rn - Rm), storing it in Rd.
 
-    return operand_1 | operand_2;    
+    @param Rd The destination register.
+    @param Rn Operand 1, as a register.
+    @param Rm Operand 2, as a register.
+*/
+void Interpreter::sub(std::string Rd, std::string Rn, std::string Rm){
+    uint32_t operand_1 = *string_to_register_pointer(Rn);
+    uint32_t operand_2 = *string_to_register_pointer(Rm);
+
+    uint32_t* destination_register = string_to_register_pointer(Rd);
+
+    *destination_register = operand_1 - operand_2;
+
+    // Format and output what happened
+    std::cout << "SUB " << Rd << ", " << Rn << ", " << Rm << "\n"
+              << " -> " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << *destination_register                                                                    
+              << std::dec << std::endl;
 }
 
 /**
-    @brief Subtract two values, returning the value as a uint32_t.
-    
-    @param a The first operand as a std::string in hex format.
-    @param b The second operand as a std::string in hex format.
-    @return a uint32_t with the result of the subtraction (a - b).
-*/
-uint32_t Interpreter::sub(std::string a, std::string b){
-    uint32_t operand_1 = std::stoul(a, nullptr, 16);
-    uint32_t operand_2 = std::stoul(b, nullptr, 16);
+    @brief Take the bitwise XOR of Rn and Rm, storing it in Rd.
 
-    return operand_1 - operand_2;
+    @param Rd The destination register.
+    @param Rn Operand 1, as a register.
+    @param Rm Operand 2, as a register.
+*/
+void Interpreter::lxor(std::string Rd, std::string Rn, std::string Rm){
+    uint32_t operand_1 = *string_to_register_pointer(Rn);
+    uint32_t operand_2 = *string_to_register_pointer(Rm);
+
+    uint32_t* destination_register = string_to_register_pointer(Rd);
+
+    *destination_register = operand_1 ^ operand_2;
+
+    // Format and output what happened
+    std::cout << "XOR " << Rd << ", " << Rn << ", " << Rm << "\n"
+              << " -> " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << *destination_register                                                                    
+              << std::dec << std::endl;
 }
 
 /**
-    @brief Perform a bitwise XOR on two operands.
-    
-    @param a The first operand as a std::string in hex format.
-    @param b The second operand as a std::string in hex format.
-    @return a uint32_t with the result of the bitwise XOR.
-*/
-uint32_t Interpreter::lxor(std::string a, std::string b){
-    uint32_t operand_1 = std::stoul(a, nullptr, 16);
-    uint32_t operand_2 = std::stoul(b, nullptr, 16);
+    @brief Store Imm in Rd.
 
-    return operand_1 ^ operand_2;    
+    @param Rd The destination register.
+    @param Imm The value to load into Rd, as a hex value in the format #0x...
+*/
+void Interpreter::mov(std::string Rd, std::string Imm){
+    uint32_t* destination_register = string_to_register_pointer(Rd);
+
+    *destination_register = immediate_to_int(Imm);
+    std::cout << "MOV " << Rd << ", " << Imm << "\n"
+            << " -> " << Rd << " = "
+            << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+            << *destination_register                                                                    
+            << std::dec << std::endl;
 }
 
 #pragma endregion
