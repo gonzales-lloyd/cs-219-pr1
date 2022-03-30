@@ -1,13 +1,9 @@
 # cs-219-pr1
-This is **project part 2 for CS 219 - Computer Organization**. It is intended to emulate a program capable of interpreting and processing assembly language.
+This is **project part 3 for CS 219 - Computer Organization**. It is intended to emulate a program capable of interpreting and processing assembly language.
 
 *Note:* I didn't use `using namespace std` for the sake of personal clarity. This should be the sole difference between `code_style.cpp` and my code. I also use snake_case, not camelCase.
 
-The following files were used for testing and can be ignored:
-- `tester.py`
-- `interp.py`
-- `requirements.txt`
-- `Programming-Project-*.txt`
+Anything in the `/testing` folder was used for testing and can be ignored.
 
 ## Installation
 Install Linux or WSL.
@@ -16,9 +12,7 @@ Install Linux or WSL.
 - Run `make`.
 - Run `./program <path-to-instruction-file>`.
 
-`handtests.txt` and `Programming-Project-2.txt` are included with this repository, and can be executed with `./program handtests.txt` and `./program Programming-Project-2.txt`, respectively. The first file contains no second operand for functions that do not currently use a second operand; the second file contains 100 lines for each function *with* a second operand..
-
-*Debug only*: To generate new test files, use `interp.py`. For handwritten testing, use `handtests.py`.
+`Programming-Project-3.txt` is included with this repository, and can be executed with `./program Programming-Project-3.txt`. This file contains a list of hand-written instructions carried over from previous assignments.
 
 This project was tested and built on WSL: Ubuntu 20.04 LTS. It should work anywhere `make` and `g++` are available. (Also tested on Kali 2021.2)
 
