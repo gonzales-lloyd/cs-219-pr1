@@ -1,4 +1,34 @@
-MOV r1, #0x4
+; Demonstrate zero-init
+ADD r0, r1, r2
+; Declare all unique constants - r0 is just a "data" register
+MOV r1, #0x1
 MOV r2, #0xFFFFFFFF
-ADD r3, r2, r1
-ASR r3, r3
+MOV r3, #0xAA
+MOV r4, #0x55
+MOV r5, #0x0
+MOV r6, #0x80000000
+; Perform first half of hand-tests
+ADD r0, r1, r1
+ADD r0, r1, r2
+AND r0, r3, r4
+AND r0, r2, r5
+ASR r4, r6
+ASR r1, r1
+; Declare second half of hand-tests
+MOV r1, #0x0
+MOV r2, #0x40000000
+MOV r3, #0x2
+MOV r4, #0x1
+MOV r5, #0xFFFFFFFF
+; Perform second half of hand-tests
+ASR r2, r2
+LSR r2, r6
+LSR r2, r4
+LSL r2, r4
+LSL r2, r6
+ORR r6, r1, r1
+ORR r5, r1, r5
+SUB r5, r4, r4
+SUB r5, r4, r3
+XOR r5, r5, r5
+XOR r1, r1, r1
