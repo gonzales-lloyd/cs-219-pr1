@@ -155,7 +155,11 @@ void Interpreter::add(std::string Rd, std::string Rn, std::string Rm){
     *destination_register = operand_1 + operand_2;
 
     // Format and output what happened
-    std::cout << "ADD " << Rd << ", " << Rn << ", " << Rm << "\n"
+    std::cout << "ADD " << Rd << ", " << Rn << ", " << Rm << "\n -> semantic: " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_1 << " + " 
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_2 << "\n"
               << " -> " << Rd << " = "
               << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
               << *destination_register                                                                    
