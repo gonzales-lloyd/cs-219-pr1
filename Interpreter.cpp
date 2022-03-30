@@ -56,6 +56,11 @@ void Interpreter::interpret_line(std::string line){
     // This implicitly removes all whitespace and stores variables as needed
     ss >> operation >> operand_1 >> operand_2 >> operand_3;
 
+    // Ignore comments, starting with "; "
+    if(operation == ";"){
+        return;
+    }
+
     // Choose what to do based on the operation.
     // It might be "cleaner" to use an enum or a dict with switch statements
     // But again, I'm erring towards "minimum working" since I don't know what
