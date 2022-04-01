@@ -15,14 +15,12 @@ AND r0, r2, r5
 ASR r4, r6
 ASR r1, r1
 ; Declare second half of hand-tests
-MOV r0, #0x80000000
 MOV r1, #0x0
 MOV r2, #0x40000000
 MOV r3, #0x2
 MOV r4, #0x1
 MOV r5, #0xFFFFFFFF
 ; Perform second half of hand-tests
-ASR r0, r0
 ASR r2, r2
 LSR r2, r6
 LSR r2, r4
