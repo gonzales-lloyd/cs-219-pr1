@@ -36,9 +36,6 @@ void Interpreter::interpret_line(std::string line){
     // Begin by converting all commas to spaces
     // https://www.cplusplus.com/forum/general/33581/
     std::replace(line.begin(), line.end(), ',', ' ');
-    // Also, convert full string to uppercase
-    // https://stackoverflow.com/questions/735204/convert-a-string-in-c-to-upper-case
-    std::transform(line.begin(), line.end(), line.begin(), ::toupper);
     
     // Since interpret_line is a public function that could theoretically be called
     // without respect to a file, everything is a std::string to begin with
@@ -55,6 +52,10 @@ void Interpreter::interpret_line(std::string line){
 
     // This implicitly removes all whitespace and stores variables as needed
     ss >> operation >> operand_1 >> operand_2 >> operand_3;
+
+    // Convert only `operation` to uppercase; others can just be handled in their respective functions
+    // https://stackoverflow.com/questions/735204/convert-a-string-in-c-to-upper-case
+    std::transform(operation.begin(), operation.end(), operation.begin(), ::toupper);
 
     // Ignore comments, starting with "; "
     if(operation == ";"){
@@ -97,6 +98,7 @@ void Interpreter::interpret_line(std::string line){
  * Use *result = ... to update a register.
  */
 uint32_t* Interpreter::string_to_register_pointer(std::string reg){
+    std::transform(reg.begin(), reg.end(), reg.begin(), ::toupper);
     if(reg == "R0"){
         return &r0;
     }else if(reg == "R1"){
@@ -182,7 +184,11 @@ void Interpreter::land(std::string Rd, std::string Rn, std::string Rm){
     *destination_register = operand_1 & operand_2;
 
     // Format and output what happened
-    std::cout << "AND " << Rd << ", " << Rn << ", " << Rm << "\n"
+    std::cout << "AND " << Rd << ", " << Rn << ", " << Rm << "\n -> semantic: " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_1 << " & " 
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_2 << "\n"
               << " -> " << Rd << " = "
               << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
               << *destination_register                                                                    
@@ -197,7 +203,9 @@ void Interpreter::land(std::string Rd, std::string Rn, std::string Rm){
 */
 void Interpreter::asr(std::string Rd, std::string Rn){
     //begin with the unsigned bits
-    uint32_t operand_1 = *string_to_register_pointer(Rn);
+    uint32_t original_operand = *string_to_register_pointer(Rn);
+    //create copy; use original_operand for printing
+    uint32_t operand_1 = original_operand;
     // convince the compiler it's a signed without changing bits
     int32_t* step_1 = reinterpret_cast<int32_t*>(&operand_1);
     *step_1 = *step_1 >> 1;
@@ -210,7 +218,9 @@ void Interpreter::asr(std::string Rd, std::string Rn){
     *destination_register = *step_2;
 
     // Format and output what happened
-    std::cout << "ASR " << Rd << ", " << Rn << "\n"
+    std::cout << "ASR " << Rd << ", " << Rn << "\n -> semantic: " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << original_operand << " >> 1 \n" 
               << " -> " << Rd << " = "
               << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
               << *destination_register                                                                    
@@ -232,7 +242,9 @@ void Interpreter::lsr(std::string Rd, std::string Rn){
     *destination_register = operand_1 >> 1;
 
     // Format and output what happened
-    std::cout << "LSR " << Rd << ", " << Rn << "\n"
+    std::cout << "LSR " << Rd << ", " << Rn << "\n -> semantic: " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_1 << " >>> 1 \n" 
               << " -> " << Rd << " = "
               << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
               << *destination_register                                                                    
@@ -254,7 +266,9 @@ void Interpreter::lsl(std::string Rd, std::string Rn){
     *destination_register = operand_1 << 1;
 
     // Format and output what happened
-    std::cout << "LSL " << Rd << ", " << Rn << "\n"
+    std::cout << "LSL " << Rd << ", " << Rn << "\n -> semantic: " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_1 << " << 1 \n" 
               << " -> " << Rd << " = "
               << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
               << *destination_register                                                                    
@@ -277,7 +291,11 @@ void Interpreter::orr(std::string Rd, std::string Rn, std::string Rm){
     *destination_register = operand_1 | operand_2;
 
     // Format and output what happened
-    std::cout << "ORR " << Rd << ", " << Rn << ", " << Rm << "\n"
+    std::cout << "ORR " << Rd << ", " << Rn << ", " << Rm << "\n -> semantic: " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_1 << " | " 
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_2 << "\n"
               << " -> " << Rd << " = "
               << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
               << *destination_register                                                                    
@@ -300,7 +318,11 @@ void Interpreter::sub(std::string Rd, std::string Rn, std::string Rm){
     *destination_register = operand_1 - operand_2;
 
     // Format and output what happened
-    std::cout << "SUB " << Rd << ", " << Rn << ", " << Rm << "\n"
+    std::cout << "SUB " << Rd << ", " << Rn << ", " << Rm << "\n -> semantic: " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_1 << " - " 
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_2 << "\n"
               << " -> " << Rd << " = "
               << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
               << *destination_register                                                                    
@@ -323,7 +345,11 @@ void Interpreter::lxor(std::string Rd, std::string Rn, std::string Rm){
     *destination_register = operand_1 ^ operand_2;
 
     // Format and output what happened
-    std::cout << "XOR " << Rd << ", " << Rn << ", " << Rm << "\n"
+    std::cout << "XOR " << Rd << ", " << Rn << ", " << Rm << "\n -> semantic: " << Rd << " = "
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_1 << " ^ " 
+              << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
+              << operand_2 << "\n"
               << " -> " << Rd << " = "
               << "0x" << std::setfill ('0') << std::setw(8) << std::hex << std::uppercase
               << *destination_register                                                                    
