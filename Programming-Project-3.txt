@@ -1,7 +1,7 @@
 ; Demonstrate zero-init and capitalization, spacing conditions
 ADD r0, r1, r2
-AdD R0,R1,r2
-MOV r0,     0X0
+add R0,R1,r2
+MOV r0,     #0X0
 ; Declare all unique constants - r0 is just a "data" register
 MOV r1, #0x1
 MOV r2, #0xFFFFFFFF
